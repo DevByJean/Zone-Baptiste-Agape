@@ -1,192 +1,140 @@
-# ZOBA — Site Web de la Zone Baptiste Agapé
+# Zone Baptiste Agapé (ZOBA) ⛪
 
-**ZOBA** est le site officiel de la Zone Baptiste Agapé, gérée par la Convention Baptiste du Togo (CBT). Ce repository contient un frontend React/Vite/Tailwind et un backend Node/Express/MongoDB pour gérer l'information publique, les dons, les activités et l'administration.
+Bienvenue sur le dépôt officiel du projet **Zone Baptiste Agapé (ZOBA)**, la plateforme web de la fraternité, foi et service au sein de la Convention Baptiste du Togo (CBT).
 
-## Fonctionnalités principales
-
-### Site public
-
-- Page d'accueil avec mission, activités et actualités
-- Page À propos et présentation des départements
-- Page Activités avec inscriptions en ligne
-- Section Actualités
-- Galerie photo
-- Formulaire de contact
-- Page de dons
-
-### Administration
-
-- Gestion des activités (CRUD)
-- Gestion des actualités (CRUD)
-- Gestion de la galerie (CRUD)
-- Gestion des membres du bureau
-- Lecture et réponse aux contacts
-- Gestion des abonnés newsletter
-- Suivi des inscriptions aux activités
-- Suivi des dons
-
-## Stack technique
-
-- Frontend : React 18, TypeScript, Vite
-- UI : Tailwind CSS
-- Backend : Node.js, Express.js, TypeScript
-- Base de données : MongoDB via Mongoose
-- Authentification : JWT
-- Icônes : Lucide React
-
-## Architecture du projet
-
-```
-project-bolt/
-├── backend/                # Backend Node.js
-│   ├── package.json
-│   └── src/
-│       ├── config/         # Configuration de MongoDB et initialisation
-│       ├── middleware/     # Auth et validation
-│       ├── models/         # Modèles Mongoose
-│       └── routes/         # Routes API Express
-├── src/                    # Frontend React
-│   ├── components/         # Navbar, Footer, éléments UI
-│   ├── lib/                # API client et Supabase
-│   ├── pages/              # Pages publiques
-│   │   └── admin/          # Interface d'administration
-│   └── types/              # Types TypeScript
-├── supabase/               # Migrations et schéma Supabase
-├── implementation.md       # Guide d'intégration Stripe
-├── README.md               # Documentation du projet
-└── package.json            # Dépendances frontend
-```
-
-## Prérequis
-
-- Node.js >= 18
-- npm
-- MongoDB (local ou Atlas)
-
-## Installation
-
-```bash
-# Racine du frontend
-npm install
-
-# Backend
-cd backend && npm install
-```
-
-## Configuration backend
-
-1. Copier le fichier d'exemple :
-
-```bash
-cp backend/.env.example backend/.env
-```
-
-2. Compléter `backend/.env` :
-
-```env
-MONGODB_URI=mongodb://localhost:27017/zoba
-JWT_SECRET=votre-secret-jwt-tres-securise
-PORT=5000
-NODE_ENV=development
-FRONTEND_URL=http://localhost:5173
-ADMIN_EMAIL=admin@zoba-cbt.org
-ADMIN_PASSWORD=Zoba@2025!
-```
-
-### Option Stripe
-
-Pour activer Stripe, ajoutez également :
-
-```env
-STRIPE_SECRET_KEY=sk_test_votre_cle
-STRIPE_WEBHOOK_SECRET=whsec_votre_secret
-STRIPE_SUCCESS_URL=http://localhost:5173/donations/success
-STRIPE_CANCEL_URL=http://localhost:5173/donations/cancel
-```
-
-> Consultez `implementation.md` pour une documentation complète sur l’intégration Stripe.
-
-## Démarrage local
-
-```bash
-# Terminal 1 : backend
-cd backend && npm run dev
-
-# Terminal 2 : frontend
-npm run dev
-```
-
-- Frontend : `http://localhost:5173`
-- Backend API : `http://localhost:5000`
-
-## Build production
-
-```bash
-# Frontend
-npm run build
-
-# Backend
-cd backend && npm run build && npm start
-```
-
-## Administration
-
-- URL : `/admin`
-- Email : `admin@zoba-cbt.org`
-- Mot de passe : `Zoba@2025!`
-
-> Changer le mot de passe admin dès la première connexion.
-
-## API principale
-
-| Méthode | Endpoint             | Description                   |
-| ------- | -------------------- | ----------------------------- |
-| POST    | `/api/auth/login`    | Connexion admin               |
-| GET     | `/api/members`       | Liste des membres             |
-| POST    | `/api/members`       | Créer un membre               |
-| GET     | `/api/activities`    | Liste des activités           |
-| POST    | `/api/activities`    | Créer une activité            |
-| GET     | `/api/news`          | Liste des actualités          |
-| POST    | `/api/news`          | Créer un article              |
-| GET     | `/api/gallery`       | Liste des éléments de galerie |
-| POST    | `/api/contacts`      | Envoyer un message            |
-| POST    | `/api/subscribers`   | S'abonner à la newsletter     |
-| POST    | `/api/registrations` | S'inscrire à une activité     |
-| POST    | `/api/donations`     | Enregistrer un don            |
-
-## Modèles principaux
-
-- `Admin` — administrateurs
-- `Member` — membres du bureau
-- `Activity` — activités et événements
-- `News` — actualités
-- `Gallery` — images de la galerie
-- `Contact` — messages de contact
-- `Subscriber` — abonnés newsletter
-- `Registration` — inscriptions aux événements
-- `Donation` — dons
-
-## Notes importantes
-
-- Le backend requis MongoDB avant démarrage.
-- Ne jamais exposer la clé secrète Stripe côté frontend.
-- Le webhook Stripe doit être vérifié avec `STRIPE_WEBHOOK_SECRET`.
-- La page de dons frontend est dans `src/pages/DonationsPage.tsx`.
-- Les routes backend de donation sont dans `backend/src/routes/donation.routes.ts`.
-
-## Documentation complémentaire
-
-- `implementation.md` : guide Stripe complet
-- `backend/.env.example` : variables d’environnement backend
-- `src/lib/supabase.ts` : configuration client Supabase
-
-## Contribuer
-
-1. Forker le repository
-2. Créer une branche de fonctionnalité
-3. Ajouter ou modifier du code
-4. Ouvrir une pull request
+Cette application moderne permet de présenter l'association, de gérer les différents départements, de partager les actualités et activités, de collecter des dons et de gérer le contenu via un espace d'administration sécurisé.
 
 ---
 
-Projet ZOBA — Zone Baptiste Agapé
+## 🚀 Technologies Utilisées
+
+La plateforme repose sur une architecture moderne divisée en deux parties principales (Frontend et Backend) :
+
+### Frontend
+*   **Framework :** [React](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
+*   **Outil de build :** [Vite](https://vitejs.dev/)
+*   **Design & Style :** [Tailwind CSS](https://tailwindcss.com/) + [Lucide React](https://lucide.dev/) (icônes)
+*   **Routage :** [React Router DOM](https://reactrouter.com/)
+*   **Backend-as-a-Service (BaaS) :** [Supabase](https://supabase.com/) (pour la gestion de données et l'authentification)
+
+### Backend (Serveur API)
+*   **Runtime :** [Node.js](https://nodejs.org/)
+*   **Framework :** [Express](https://expressjs.com/)
+*   **Base de données :** [MongoDB](https://www.mongodb.com/) via [Mongoose](https://mongoosejs.com/)
+*   **Sécurité :** JSON Web Tokens (JWT) & BcryptJS
+*   **Paiements :** [Stripe](https://stripe.com/) pour la gestion des dons sécurisés
+
+---
+
+## 📂 Structure du Projet
+
+```text
+├── src/                  # Code source du Frontend (React)
+│   ├── components/       # Composants réutilisables (Navbar, Footer, Loader...)
+│   ├── hooks/            # Hooks React personnalisés
+│   ├── lib/              # Configurations des clients tiers (Supabase...)
+│   ├── pages/            # Pages de l'application
+│   │   └── admin/        # Pages de l'espace administration
+│   ├── types/            # Déclarations des types TypeScript
+│   ├── App.tsx           # Routeur et layout principal
+│   ├── index.css         # Styles globaux & Tailwind
+│   └── main.tsx          # Point d'entrée de l'application React
+│
+├── src2/                 # Code source du Backend (Express & MongoDB)
+│   ├── config/           # Configuration de la base de données
+│   ├── controllers/      # Logique métier des APIs
+│   ├── middleware/       # Middlewares Express (authentification, logs...)
+│   ├── models/           # Modèles de données Mongoose (MongoDB)
+│   ├── routes/           # Définition des points d'accès API
+│   └── server.ts         # Point d'entrée du serveur Express
+│
+├── dist/                 # Fichiers de production compilés (Frontend)
+├── supabase/             # Fichiers de migration et de configuration Supabase
+├── package.json          # Dépendances et scripts de démarrage
+└── tailwind.config.js    # Configuration Tailwind CSS
+```
+
+---
+
+## ⚙️ Configuration & Installation
+
+### Prérequis
+*   [Node.js](https://nodejs.org/) (Version 18 ou supérieure recommandée)
+*   Un compte et un projet [Supabase](https://supabase.com/)
+*   Une base de données [MongoDB](https://www.mongodb.com/atlas) (ou instance locale)
+
+### 1. Cloner le projet
+```bash
+git clone <URL_DE_VOTRE_DEPOT_GIT>
+cd project
+```
+
+### 2. Installer les dépendances
+```bash
+npm install
+```
+
+### 3. Configurer les variables d'environnement (`.env`)
+Créez ou modifiez le fichier `.env` à la racine du projet en y ajoutant vos configurations :
+
+```env
+# Configuration Supabase
+VITE_SUPABASE_URL=https://votre-projet.supabase.co
+VITE_SUPABASE_ANON_KEY=votre-cle-anon-supabase
+
+# Configuration MongoDB (Backend)
+MONGODB_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/zoba
+
+# Configuration JWT (Backend)
+JWT_SECRET=votre-cle-secrete-jwt
+
+# Configuration Serveur
+PORT=5000
+NODE_ENV=development
+FRONTEND_URL=http://localhost:5173
+
+# Identifiants de l'administrateur par défaut
+ADMIN_EMAIL=admin@zoba-cbt.org
+ADMIN_PASSWORD=votre-mot-de-passe-admin
+```
+
+---
+
+## 🛠️ Utilisation en Mode Développement
+
+### Lancer le Frontend (Vite)
+Pour démarrer le serveur de développement React :
+```bash
+npm run dev
+```
+L'application sera accessible par défaut à l'adresse : [http://localhost:5173](http://localhost:5173).
+
+### Lancer le Backend (Express)
+Pour exécuter le serveur API backend :
+```bash
+# Assurez-vous d'avoir configuré le fichier .env
+npx ts-node src2/server.ts
+```
+Le serveur écoutera sur le port défini par la variable `PORT` (par défaut `5000`).
+
+---
+
+## 🏁 Scripts Disponibles
+
+Dans le répertoire du projet, vous pouvez exécuter les commandes suivantes :
+
+*   `npm run dev` : Démarre le serveur de développement Frontend (Vite).
+*   `npm run build` : Compile l'application Frontend pour la production dans le dossier `dist/`.
+*   `npm run preview` : Lance un aperçu local de la build de production.
+*   `npm run lint` : Analyse le code à la recherche d'erreurs de style avec ESLint.
+*   `npm run typecheck` : Vérifie la validité des types TypeScript dans l'application.
+
+---
+
+## 🔒 Espace Administrateur
+
+La plateforme intègre un tableau de bord administratif complet accessible via la route `/admin`. Il permet de :
+*   Gérer les articles de presse et actualités de la Zone.
+*   Publier et organiser les activités et événements.
+*   Visualiser les rapports d'activités et de dons.
+*   Gérer la galerie d'images.

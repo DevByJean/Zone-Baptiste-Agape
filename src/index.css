@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+body {
+  overscroll-behavior-y: none; /* évite le bounce sur desktop */
+}
+/* Dans votre fichier CSS (index.css ou app.css) */
+link {
+  @apply rounded-full w-10 h-10 bg-teal-700 hover:bg-teal-600 flex items-center justify-center transition-colors overflow-hidden;
+}
+
+@supports (padding: env(safe-area-inset-bottom)) {
+  footer { padding-bottom: env(safe-area-inset-bottom); }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    @apply text-gray-800 bg-white;
+  }
+  h1, h2, h3, h4, h5 {
+    font-family: 'Montserrat', 'Inter', sans-serif;
+  }
+}
+
+@layer components {
+  .section-label {
+    @apply text-xs font-semibold tracking-[0.2em] uppercase text-teal-500 mb-3;
+  }
+  .section-title {
+    @apply text-3xl md:text-4xl font-bold text-teal-800 leading-tight;
+  }
+  .btn-primary {
+    @apply inline-flex items-center gap-2 bg-teal-600 text-white px-6 py-3 rounded-xl font-semibold
+           hover:bg-teal-700 active:bg-teal-800 transition-all duration-200 ease-ios shadow-sm hover:shadow-md;
+  }
+  .btn-outline {
+    @apply inline-flex items-center gap-2 border-2 border-teal-600 text-teal-600 px-6 py-3 rounded-lg font-semibold
+           hover:bg-teal-600 hover:text-white transition-all duration-200;
+  }
+  .btn-primary, .btn-outline, .card {
+    @apply active:scale-[0.97] transition-transform duration-150;
+  }
+  .card {
+    @apply bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden
+           hover:shadow-lg hover:shadow-teal-900/5
+           hover:shadow-md transition-shadow duration-300;
+  }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer components {
+  .input-field {
+    @apply w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm active:scale-[1]
+           focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent
+           bg-white placeholder-gray-400;
+  }
+}
