@@ -94,7 +94,7 @@ NODE_ENV=development
 FRONTEND_URL=http://localhost:5173
 
 # Identifiants de l'administrateur par défaut
-ADMIN_EMAIL=admin@zoba-cbt.org
+ADMIN_EMAIL=johndoe@gmail.com
 ADMIN_PASSWORD=votre-mot-de-passe-admin
 ```
 
