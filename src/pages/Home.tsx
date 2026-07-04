@@ -4,7 +4,7 @@ import {
   Users, BookOpen, Heart, Star, ArrowRight, Calendar, MapPin,
   ChevronRight, Quote
 } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { api } from '../lib/api';
 import type { Activity, News, GalleryItem } from '../types/database';
 import CountUp from '../components/CountUp';
 
@@ -417,30 +417,25 @@ export default function Home() {
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
 
   useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
+    const load = async () => {
+      try {
+        const [activitiesData, newsData, galleryData] = await Promise.all([
+          api.get('/activities?upcomming=true'),
+          api.get('/news?limit=3'),
+          api.get('/gallery?limit=6'),
+        ]);
 
-    Promise.all([
-      supabase
-        .from('activities')
-        .select('id, title, event_date, location, department, image_url')
-        .gte('event_date', today)
-        .order('event_date')
-        .limit(4),
-      supabase
-        .from('news')
-        .select('id, title, excerpt, published_at, image_url')
-        .order('published_at', { ascending: false })
-        .limit(3),
-      supabase
-        .from('gallery')
-        .select('id, image_url, caption')
-        .order('created_at', { ascending: false })
-        .limit(6),
-    ]).then(([activitiesRes, newsRes, galleryRes]) => {
-      setActivities(activitiesRes.data ?? []);
-      setNews(newsRes.data ?? []);
-      setGallery(galleryRes.data ?? []);
-    });
+        setActivities(Array.isArray(activitiesData) ? activitiesData : []);
+        setNews(Array.isArray(newsData) ? newsData : []);
+        setGallery(Array.isArray(galleryData) ? galleryData : []);
+      } catch {
+        setActivities([]);
+        setNews([]);
+        setGallery([]);
+      }
+    };
+
+    void load();
   }, []);
 
   return (

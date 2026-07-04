@@ -1,24 +1,49 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabase';
-import type { User } from '@supabase/supabase-js';
 import AdminLogin from './AdminLogin';
 import AdminDashboard from './AdminDashboard';
+import { api } from '../../lib/api';
+
+type AdminUser = {
+  id: string;
+  email: string;
+  name: string;
+};
 
 export default function AdminPage() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AdminUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    const verifySession = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
+      try {
+        const data = await api.get('/auth/verify', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-    return () => subscription.unsubscribe();
+        if (data?.valid) {
+          setUser(data.admin);
+        } else {
+          localStorage.removeItem('token');
+          setUser(null);
+        }
+      } catch {
+        localStorage.removeItem('token');
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    verifySession();
   }, []);
 
   if (loading) {

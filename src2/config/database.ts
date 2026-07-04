@@ -2,35 +2,55 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import Admin from '../models/Admin.models';
 
+/**
+ * Ce fichier était manquant / mal référencé : le "database.ts" que tu avais
+ * uploadé était en réalité le fichier de types frontend
+ * (src/types/database.ts, utilisé par AdminDashboard.tsx), pas le fichier
+ * backend de connexion Mongo. Résultat : server.ts importait une fonction
+ * connectDB() qui n'existait nulle part → le serveur ne démarrait jamais
+ * correctement, d'où le "failed to fetch" côté frontend (il n'y a
+ * littéralement rien qui écoute sur le port 5000).
+ */
+
 export const connectDB = async (): Promise<void> => {
-    const mongoUri = process.env.MONGODB_URI;
+  const uri = process.env.MONGODB_URI;
 
-    if (!mongoUri) {
-        throw new Error("MONGO_URI non definie dans les variables d\'environnement");
-    }
+  if (!uri) {
+    throw new Error(
+      "La variable d'environnement MONGODB_URI est manquante. Ajoute-la dans ton fichier .env (ex: MONGODB_URI=mongodb://localhost:27017/zoba)."
+    );
+  }
 
-    try {
-        const conn = await mongoose.connect(mongoUri);
-        console.log(`MongoDB connecte: ${conn.connection.host}`);
-    } catch (error) {
-        console.error('Erreur de connexion MongoDB:', error);
-        throw error;
-    }
+  await mongoose.connect(uri);
+  await seedInitialAdmin();
 };
 
-const createInitialAdmin = async (): Promise<void> => {
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@zoba-cbt.org';
-    const adminPassword = process.env.ADMIN_PASSWORD || 'Zoba@2025!';
+/**
+ * Crée un compte admin par défaut au premier démarrage si aucun admin
+ * n'existe encore en base. Sans ça, la page de login renverra toujours
+ * "Identifiants invalides" puisqu'il n'y a personne à qui se connecter.
+ */
+const seedInitialAdmin = async (): Promise<void> => {
+  const email = process.env.ADMIN_EMAIL;
+  const password = process.env.ADMIN_PASSWORD;
+  const name = process.env.ADMIN_NAME || 'Administrateur';
 
-    const existingAdmin = await Admin.findOne({email: adminEmail });
+  if (!email || !password) {
+    console.warn(
+      "ADMIN_EMAIL / ADMIN_PASSWORD non définis dans .env : aucun compte admin par défaut n'a été créé."
+    );
+    return;
+  }
 
-    if (!existingAdmin) {
-        const hashedPassword = await bcrypt.hash(adminPassword, 10);
-        await Admin.create({
-            email: adminEmail,
-            password: hashedPassword,
-            name: 'Administrateur'
-        });
-        console.log('Admin initial cree:', adminEmail);
-    }
+  const existing = await Admin.findOne({ email: email.toLowerCase() });
+  if (existing) return;
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  await Admin.create({
+    email: email.toLowerCase(),
+    password: hashedPassword,
+    name,
+  });
+
+  console.log(`Compte admin initial créé pour ${email}.`);
 };

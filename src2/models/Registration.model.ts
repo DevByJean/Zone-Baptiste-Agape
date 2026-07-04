@@ -8,6 +8,10 @@ export interface IRegistration extends Document {
   church?: string;
   notes?: string;
   status: 'pending' | 'confirmed' | 'cancelled';
+  paymentMethod?: string;
+  transactionId?: string;
+  amount?: number;
+  paymentStatus?: 'pending' | 'completed' | 'failed' | 'refunded';
   createdAt: Date;
   updatedAt: Date;
 }
@@ -20,7 +24,11 @@ const RegistrationSchema: Schema = new Schema(
     phone: { type: String, required: true },
     church: { type: String },
     notes: { type: String },
-    status: { type: String, enum: ['pending', 'confirmed', 'cancelled'], default: 'pending' }
+    status: { type: String, enum: ['pending', 'confirmed', 'cancelled'], default: 'pending' },
+    paymentMethod: { type: String },
+    transactionId: { type: String },
+    amount: { type: Number },
+    paymentStatus: { type: String, enum: ['pending', 'completed', 'failed', 'refunded'] }
   },
   { timestamps: true }
 );

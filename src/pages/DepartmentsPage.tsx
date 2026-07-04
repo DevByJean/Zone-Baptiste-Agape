@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Calendar, MapPin, ChevronRight } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { api } from '../lib/api';
 import type { Activity, Department } from '../types/database';
 
 type Dept = { id: Department; label: string; icon: string; color: string; bgColor: string; description: string; verse: string; verseRef: string };
@@ -56,13 +56,16 @@ export default function DepartmentsPage() {
   const [activities, setActivities] = useState<Activity[]>([]);
 
   useEffect(() => {
-    supabase
-      .from('activities')
-      .select('*')
-      .eq('department', active)
-      .order('event_date')
-      .limit(6)
-      .then(({ data }) => setActivities(data ?? []));
+    const load = async () => {
+      try {
+        const data = await api.get(`/activities?departement=${encodeURIComponent(active)}&upcomming=true`);
+        setActivities(Array.isArray(data) ? data : []);
+      } catch {
+        setActivities([]);
+      }
+    };
+
+    void load();
   }, [active]);
 
   const current = DEPTS.find(d => d.id === active)!;

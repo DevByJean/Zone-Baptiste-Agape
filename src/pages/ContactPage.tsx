@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { MapPin, Phone, Mail, CheckCircle } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { api } from '../lib/api';
 import type { ContactInsert } from '../types/database';
 
 export default function ContactPage() {
@@ -11,9 +11,13 @@ export default function ContactPage() {
     e.preventDefault();
     setStatus('loading');
     const payload: ContactInsert = form;
-    const { error } = await supabase.from('contacts').insert(payload);
-    setStatus(error ? 'error' : 'success');
-    if (!error) setForm({ name: '', email: '', phone: '', message: '' });
+    try {
+      await api.post('/contact', { data: payload });
+      setStatus('success');
+      setForm({ name: '', email: '', phone: '', message: '' });
+    } catch {
+      setStatus('error');
+    }
   };
 
   return (

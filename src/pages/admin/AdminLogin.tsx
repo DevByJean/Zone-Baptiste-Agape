@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
+import { api } from '../../lib/api';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
@@ -13,9 +13,27 @@ export default function AdminLogin() {
     e.preventDefault();
     setLoading(true);
     setError('');
-    const { error: err } = await supabase.auth.signInWithPassword({ email, password });
-    if (err) setError(err.message);
-    setLoading(false);
+
+    try {
+      const normalizedEmail = email.trim().toLowerCase();
+      const data = await api.post('/auth/login', {
+        data: {
+          email: normalizedEmail,
+          password,
+        },
+      });
+
+      if (data?.token) {
+        localStorage.setItem('token', data.token);
+        window.location.href = '/admin';
+      } else {
+        throw new Error('Connexion impossible. Vérifiez vos identifiants.');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Connexion impossible.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

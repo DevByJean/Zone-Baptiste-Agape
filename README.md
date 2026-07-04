@@ -11,18 +11,20 @@ Cette application moderne permet de présenter l'association, de gérer les diff
 La plateforme repose sur une architecture moderne divisée en deux parties principales (Frontend et Backend) :
 
 ### Frontend
-*   **Framework :** [React](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
-*   **Outil de build :** [Vite](https://vitejs.dev/)
-*   **Design & Style :** [Tailwind CSS](https://tailwindcss.com/) + [Lucide React](https://lucide.dev/) (icônes)
-*   **Routage :** [React Router DOM](https://reactrouter.com/)
-*   **Backend-as-a-Service (BaaS) :** [Supabase](https://supabase.com/) (pour la gestion de données et l'authentification)
+
+- **Framework :** [React](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- **Outil de build :** [Vite](https://vitejs.dev/)
+- **Design & Style :** [Tailwind CSS](https://tailwindcss.com/) + [Lucide React](https://lucide.dev/) (icônes)
+- **Routage :** [React Router DOM](https://reactrouter.com/)
+- **Backend-as-a-Service (BaaS) :** [Supabase](https://supabase.com/) (pour la gestion de données et l'authentification)
 
 ### Backend (Serveur API)
-*   **Runtime :** [Node.js](https://nodejs.org/)
-*   **Framework :** [Express](https://expressjs.com/)
-*   **Base de données :** [MongoDB](https://www.mongodb.com/) via [Mongoose](https://mongoosejs.com/)
-*   **Sécurité :** JSON Web Tokens (JWT) & BcryptJS
-*   **Paiements :** [Stripe](https://stripe.com/) pour la gestion des dons sécurisés
+
+- **Runtime :** [Node.js](https://nodejs.org/)
+- **Framework :** [Express](https://expressjs.com/)
+- **Base de données :** [MongoDB](https://www.mongodb.com/) via [Mongoose](https://mongoosejs.com/)
+- **Sécurité :** JSON Web Tokens (JWT) & BcryptJS
+- **Paiements :** [Stripe](https://stripe.com/) pour la gestion des dons sécurisés
 
 ---
 
@@ -59,22 +61,26 @@ La plateforme repose sur une architecture moderne divisée en deux parties princ
 ## ⚙️ Configuration & Installation
 
 ### Prérequis
-*   [Node.js](https://nodejs.org/) (Version 18 ou supérieure recommandée)
-*   Un compte et un projet [Supabase](https://supabase.com/)
-*   Une base de données [MongoDB](https://www.mongodb.com/atlas) (ou instance locale)
+
+- [Node.js](https://nodejs.org/) (Version 18 ou supérieure recommandée)
+- Un compte et un projet [Supabase](https://supabase.com/)
+- Une base de données [MongoDB](https://www.mongodb.com/atlas) (ou instance locale)
 
 ### 1. Cloner le projet
+
 ```bash
 git clone <URL_DE_VOTRE_DEPOT_GIT>
 cd project
 ```
 
 ### 2. Installer les dépendances
+
 ```bash
 npm install
 ```
 
 ### 3. Configurer les variables d'environnement (`.env`)
+
 Créez ou modifiez le fichier `.env` à la racine du projet en y ajoutant vos configurations :
 
 ```env
@@ -92,10 +98,6 @@ JWT_SECRET=votre-cle-secrete-jwt
 PORT=5000
 NODE_ENV=development
 FRONTEND_URL=http://localhost:5173
-
-# Identifiants de l'administrateur par défaut
-ADMIN_EMAIL=admin@zoba-cbt.org
-ADMIN_PASSWORD=votre-mot-de-passe-admin
 ```
 
 ---
@@ -103,18 +105,24 @@ ADMIN_PASSWORD=votre-mot-de-passe-admin
 ## 🛠️ Utilisation en Mode Développement
 
 ### Lancer le Frontend (Vite)
+
 Pour démarrer le serveur de développement React :
+
 ```bash
 npm run dev
 ```
+
 L'application sera accessible par défaut à l'adresse : [http://localhost:5173](http://localhost:5173).
 
 ### Lancer le Backend (Express)
+
 Pour exécuter le serveur API backend :
+
 ```bash
 # Assurez-vous d'avoir configuré le fichier .env
 npx ts-node src2/server.ts
 ```
+
 Le serveur écoutera sur le port défini par la variable `PORT` (par défaut `5000`).
 
 ---
@@ -123,18 +131,19 @@ Le serveur écoutera sur le port défini par la variable `PORT` (par défaut `50
 
 Dans le répertoire du projet, vous pouvez exécuter les commandes suivantes :
 
-*   `npm run dev` : Démarre le serveur de développement Frontend (Vite).
-*   `npm run build` : Compile l'application Frontend pour la production dans le dossier `dist/`.
-*   `npm run preview` : Lance un aperçu local de la build de production.
-*   `npm run lint` : Analyse le code à la recherche d'erreurs de style avec ESLint.
-*   `npm run typecheck` : Vérifie la validité des types TypeScript dans l'application.
+- `npm run dev` : Démarre le serveur de développement Frontend (Vite).
+- `npm run build` : Compile l'application Frontend pour la production dans le dossier `dist/`.
+- `npm run preview` : Lance un aperçu local de la build de production.
+- `npm run lint` : Analyse le code à la recherche d'erreurs de style avec ESLint.
+- `npm run typecheck` : Vérifie la validité des types TypeScript dans l'application.
 
 ---
 
 ## 🔒 Espace Administrateur
 
 La plateforme intègre un tableau de bord administratif complet accessible via la route `/admin`. Il permet de :
-*   Gérer les articles de presse et actualités de la Zone.
-*   Publier et organiser les activités et événements.
-*   Visualiser les rapports d'activités et de dons.
-*   Gérer la galerie d'images.
+
+- Gérer les articles de presse et actualités de la Zone.
+- Publier et organiser les activités et événements.
+- Visualiser les rapports d'activités et de dons.
+- Gérer la galerie d'images.

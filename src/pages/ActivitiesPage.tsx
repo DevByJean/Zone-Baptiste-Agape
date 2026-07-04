@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Calendar, MapPin, ChevronRight, X } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { api } from '../lib/api';
 import type { Activity, Department, RegistrationInsert } from '../types/database';
 
 const DEPARTMENTS: Department[] = ['Tous', 'Hommes', 'Femmes', 'Jeunesse', 'Enfants'];
@@ -20,9 +20,12 @@ function RegistrationModal({ activity, onClose }: { activity: Activity; onClose:
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('loading');
-    const payload: RegistrationInsert = { activity_id: activity.id, ...form };
-    const { error } = await supabase.from('registrations').insert(payload);
-    setStatus(error ? 'error' : 'success');
+    try {
+      await api.post('/registrations', { activityId: activity.id, ...form });
+      setStatus('success');
+    } catch (error) {
+      setStatus('error');
+    }
   };
 
   return (
@@ -104,9 +107,18 @@ export default function ActivitiesPage() {
 
   useEffect(() => {
     setLoading(true);
-    const query = supabase.from('activities').select('*').order('event_date');
-    (filter === 'Tous' ? query : query.eq('department', filter))
-      .then(({ data }) => { setActivities(data ?? []); setLoading(false); });
+    const fetchActivities = async () => {
+      try {
+        const query = filter !== 'Tous' ? `?departement=${filter}` : '';
+        const data = await api.get(`/activities${query}`);
+        setActivities(data);
+      } catch (error) {
+        console.error('Failed to fetch activities:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchActivities();
   }, [filter]);
 
   const fmt = (d: string) =>

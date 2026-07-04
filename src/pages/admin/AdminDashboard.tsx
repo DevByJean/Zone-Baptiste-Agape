@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
-import type { User } from '@supabase/supabase-js';
 import {
   BookOpen, Calendar, Image, Users, Mail, MessageSquare, Heart,
   LogOut, Plus, Trash2, Check, X, Edit2, Save, ClipboardList
 } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
+import { api } from '../../lib/api';
 import type {
   Activity, ActivityInsert, News, NewsInsert,
   GalleryItem, GalleryInsert, Member, MemberInsert,
   Contact, Subscriber, Registration, Donation, Department
 } from '../../types/database';
+import { ActivitiesTab } from './tab/ActivitiesTab';
 
 type Tab = 'activities' | 'news' | 'gallery' | 'members' | 'contacts' | 'subscribers' | 'registrations' | 'donations';
 
@@ -37,114 +37,7 @@ function ConfirmDelete({ onConfirm, onCancel }: { onConfirm: () => void; onCance
 
 // ─── Activities Tab ───────────────────────────────────────────────────────────
 
-function ActivitiesTab() {
-  const [items, setItems] = useState<Activity[]>([]);
-  const [form, setForm] = useState<ActivityInsert>({ title: '', description: '', image_url: '', event_date: '', location: '', department: 'Tous', organizer: 'Zone' });
-  const [editing, setEditing] = useState(false);
-  const [editId, setEditId] = useState<string | null>(null);
-  const [deleting, setDeleting] = useState<string | null>(null);
-
-  const load = () => supabase.from('activities').select('*').order('event_date', { ascending: false }).then(({ data }) => setItems(data ?? []));
-  useEffect(() => { load(); }, []);
-
-  const save = async () => {
-    if (editId) {
-      await supabase.from('activities').update(form).eq('id', editId);
-    } else {
-      await supabase.from('activities').insert(form);
-    }
-    setEditing(false); setEditId(null);
-    setForm({ title: '', description: '', image_url: '', event_date: '', location: '', department: 'Tous', organizer: 'Zone' });
-    load();
-  };
-
-  const del = async (id: string) => {
-    await supabase.from('activities').delete().eq('id', id);
-    setDeleting(null); load();
-  };
-
-  const startEdit = (a: Activity) => {
-    setForm({ title: a.title, description: a.description ?? '', image_url: a.image_url ?? '', event_date: a.event_date ?? '', location: a.location ?? '', department: a.department, organizer: a.organizer });
-    setEditId(a.id); setEditing(true);
-  };
-
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="font-bold text-teal-800 text-lg">Activités ({items.length})</h2>
-        <button onClick={() => { setEditing(true); setEditId(null); }} className="btn-primary text-sm py-2">
-          <Plus size={15} /> Ajouter
-        </button>
-      </div>
-
-      {editing && (
-        <div className="bg-teal-50 rounded-xl p-6 border border-teal-200 space-y-4">
-          <h3 className="font-semibold text-teal-800">{editId ? 'Modifier' : 'Nouvelle activité'}</h3>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div className="sm:col-span-2">
-              <label className="text-xs text-gray-600 font-medium mb-1 block">Titre *</label>
-              <input className="input-field" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="Titre de l'activité" />
-            </div>
-            <div>
-              <label className="text-xs text-gray-600 font-medium mb-1 block">Date</label>
-              <input type="date" className="input-field" value={form.event_date ?? ''} onChange={e => setForm(f => ({ ...f, event_date: e.target.value }))} />
-            </div>
-            <div>
-              <label className="text-xs text-gray-600 font-medium mb-1 block">Lieu</label>
-              <input className="input-field" value={form.location ?? ''} onChange={e => setForm(f => ({ ...f, location: e.target.value }))} placeholder="Lieu de l'événement" />
-            </div>
-            <div>
-              <label className="text-xs text-gray-600 font-medium mb-1 block">Département</label>
-              <select className="input-field" value={form.department} onChange={e => setForm(f => ({ ...f, department: e.target.value as Department }))}>
-                {DEPTS.map(d => <option key={d}>{d}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="text-xs text-gray-600 font-medium mb-1 block">Organisateur</label>
-              <select className="input-field" value={form.organizer} onChange={e => setForm(f => ({ ...f, organizer: e.target.value as 'Zone' | 'Église' }))}>
-                <option>Zone</option><option>Église</option>
-              </select>
-            </div>
-            <div className="sm:col-span-2">
-              <label className="text-xs text-gray-600 font-medium mb-1 block">URL de l'image</label>
-              <input className="input-field" value={form.image_url ?? ''} onChange={e => setForm(f => ({ ...f, image_url: e.target.value }))} placeholder="https://..." />
-            </div>
-            <div className="sm:col-span-2">
-              <label className="text-xs text-gray-600 font-medium mb-1 block">Description</label>
-              <textarea rows={3} className="input-field resize-none" value={form.description ?? ''} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Description de l'activité" />
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <button onClick={save} className="btn-primary text-sm py-2"><Save size={14} /> Enregistrer</button>
-            <button onClick={() => { setEditing(false); setEditId(null); }} className="btn-outline text-sm py-2">Annuler</button>
-          </div>
-        </div>
-      )}
-
-      <div className="space-y-3">
-        {items.map(item => (
-          <div key={item.id} className="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-100 hover:border-gray-200 transition">
-            {item.image_url && <img src={item.image_url} alt="" className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />}
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-sm text-gray-800 truncate">{item.title}</p>
-              <p className="text-xs text-gray-400">{item.event_date ?? '—'} · {item.department} · {item.organizer}</p>
-            </div>
-            <div className="flex items-center gap-1 flex-shrink-0">
-              {deleting === item.id ? (
-                <ConfirmDelete onConfirm={() => del(item.id)} onCancel={() => setDeleting(null)} />
-              ) : (
-                <>
-                  <button onClick={() => startEdit(item)} className="p-1.5 text-gray-400 hover:text-teal-600"><Edit2 size={14} /></button>
-                  <button onClick={() => setDeleting(item.id)} className="p-1.5 text-gray-400 hover:text-red-500"><Trash2 size={14} /></button>
-                </>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+<ActivitiesTab />
 
 // ─── News Tab ─────────────────────────────────────────────────────────────────
 
@@ -155,21 +48,24 @@ function NewsTab() {
   const [editId, setEditId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
 
-  const load = () => supabase.from('news').select('*').order('published_at', { ascending: false }).then(({ data }) => setItems(data ?? []));
-  useEffect(() => { load(); }, []);
+  const load = async () => {
+    const data = await api.get('/news');
+    setItems(Array.isArray(data) ? data : []);
+  };
+  useEffect(() => { void load(); }, []);
 
   const save = async () => {
     if (editId) {
-      await supabase.from('news').update(form).eq('id', editId);
+      await api.put(`/news/${editId}`, { data: form });
     } else {
-      await supabase.from('news').insert(form);
+      await api.post('/news', { data: form });
     }
     setEditing(false); setEditId(null);
     setForm({ title: '', excerpt: '', content: '', image_url: '', published_at: new Date().toISOString() });
     load();
   };
 
-  const del = async (id: string) => { await supabase.from('news').delete().eq('id', id); setDeleting(null); load(); };
+  const del = async (id: string) => { await api.delete(`/news/${id}`); setDeleting(null); void load(); };
 
   const startEdit = (n: News) => {
     setForm({ title: n.title, excerpt: n.excerpt ?? '', content: n.content ?? '', image_url: n.image_url ?? '', published_at: n.published_at });
@@ -245,15 +141,18 @@ function GalleryTab() {
   const [adding, setAdding] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
 
-  const load = () => supabase.from('gallery').select('*').order('created_at', { ascending: false }).then(({ data }) => setItems(data ?? []));
-  useEffect(() => { load(); }, []);
+  const load = async () => {
+    const data = await api.get('/gallery');
+    setItems(Array.isArray(data) ? data : []);
+  };
+  useEffect(() => { void load(); }, []);
 
   const save = async () => {
-    await supabase.from('gallery').insert(form);
-    setAdding(false); setForm({ image_url: '', caption: '', department: 'Tous' }); load();
+    await api.post('/gallery', { data: form });
+    setAdding(false); setForm({ image_url: '', caption: '', department: 'Tous' }); void load();
   };
 
-  const del = async (id: string) => { await supabase.from('gallery').delete().eq('id', id); setDeleting(null); load(); };
+  const del = async (id: string) => { await api.delete(`/gallery/${id}`); setDeleting(null); void load(); };
 
   return (
     <div className="space-y-6">
@@ -322,18 +221,21 @@ function MembersTab() {
   const [editId, setEditId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
 
-  const load = () => supabase.from('members').select('*').order('display_order').then(({ data }) => setItems(data ?? []));
-  useEffect(() => { load(); }, []);
+  const load = async () => {
+    const data = await api.get('/members');
+    setItems(Array.isArray(data) ? data : []);
+  };
+  useEffect(() => { void load(); }, []);
 
   const save = async () => {
-    if (editId) await supabase.from('members').update(form).eq('id', editId);
-    else await supabase.from('members').insert(form);
+    if (editId) await api.put(`/members/${editId}`, { data: form });
+    else await api.post('/members', { data: form });
     setEditing(false); setEditId(null);
     setForm({ name: '', role: '', photo_url: '', bio: '', organization: 'Zone', display_order: 0 });
     load();
   };
 
-  const del = async (id: string) => { await supabase.from('members').delete().eq('id', id); setDeleting(null); load(); };
+  const del = async (id: string) => { await api.delete(`/members/${id}`); setDeleting(null); void load(); };
 
   const startEdit = (m: Member) => {
     setForm({ name: m.name, role: m.role, photo_url: m.photo_url ?? '', bio: m.bio ?? '', organization: m.organization, display_order: m.display_order });
@@ -417,11 +319,14 @@ function MembersTab() {
 function ContactsTab() {
   const [items, setItems] = useState<Contact[]>([]);
 
-  const load = () => supabase.from('contacts').select('*').order('created_at', { ascending: false }).then(({ data }) => setItems(data ?? []));
-  useEffect(() => { load(); }, []);
+  const load = async () => {
+    const data = await api.get('/contact');
+    setItems(Array.isArray(data) ? data : []);
+  };
+  useEffect(() => { void load(); }, []);
 
   const markRead = async (id: string) => {
-    await supabase.from('contacts').update({ is_read: true }).eq('id', id); load();
+    await api.put(`/contact/${id}/read`); load();
   };
 
   return (
@@ -458,11 +363,14 @@ function ContactsTab() {
 function SubscribersTab() {
   const [items, setItems] = useState<Subscriber[]>([]);
 
-  const load = () => supabase.from('subscribers').select('*').order('created_at', { ascending: false }).then(({ data }) => setItems(data ?? []));
-  useEffect(() => { load(); }, []);
+  const load = async () => {
+    const data = await api.get('/subscribers');
+    setItems(Array.isArray(data) ? data : []);
+  };
+  useEffect(() => { void load(); }, []);
 
   const toggle = async (id: string, current: boolean) => {
-    await supabase.from('subscribers').update({ is_active: !current }).eq('id', id); load();
+    await api.delete(`/subscribers/${id}`); void load();
   };
 
   const active = items.filter(s => s.is_active).length;
@@ -497,13 +405,15 @@ function SubscribersTab() {
 function RegistrationsTab() {
   const [items, setItems] = useState<(Registration & { activities?: { title: string } | null })[]>([]);
 
-  const load = () =>
-    supabase.from('registrations').select('*, activities(title)').order('created_at', { ascending: false })
-      .then(({ data }) => setItems((data as typeof items) ?? []));
-  useEffect(() => { load(); }, []);
+  const load = async () => {
+    const data = await api.get('/registrations');
+    setItems((Array.isArray(data) ? data : []) as typeof items);
+  };
+  useEffect(() => { void load(); }, []);
 
   const updateStatus = async (id: string, status: Registration['status']) => {
-    await supabase.from('registrations').update({ status }).eq('id', id); load();
+    await api.put(`/registrations/${id}/status`, { data: { status } });
+    void load();
   };
 
   const statusColors = { pending: 'bg-amber-100 text-amber-700', confirmed: 'bg-green-100 text-green-700', cancelled: 'bg-red-100 text-red-700' };
@@ -541,7 +451,10 @@ function RegistrationsTab() {
 function DonationsTab() {
   const [items, setItems] = useState<Donation[]>([]);
   useEffect(() => {
-    supabase.from('donations').select('*').order('created_at', { ascending: false }).then(({ data }) => setItems(data ?? []));
+    void (async () => {
+      const data = await api.get('/donations');
+      setItems(Array.isArray(data) ? data : []);
+    })();
   }, []);
 
   const total = items.filter(d => d.status === 'completed').reduce((s, d) => s + d.amount, 0);
@@ -576,10 +489,19 @@ function DonationsTab() {
 
 // ─── Dashboard ────────────────────────────────────────────────────────────────
 
-export default function AdminDashboard({ user }: { user: User }) {
+type AdminUser = {
+  id: string;
+  email: string;
+  name: string;
+};
+
+export default function AdminDashboard({ user }: { user: AdminUser }) {
   const [tab, setTab] = useState<Tab>('activities');
 
-  const logout = () => supabase.auth.signOut();
+  const logout = () => {
+    localStorage.removeItem('token');
+    window.location.href = '/admin';
+  };
 
   const TabContent = () => {
     switch (tab) {

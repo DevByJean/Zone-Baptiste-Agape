@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { BookOpen, X } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { api } from '../lib/api';
 import type { News } from '../types/database';
 
 function ArticleModal({ article, onClose }: { article: News; onClose: () => void }) {
@@ -45,11 +45,18 @@ export default function NewsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase
-      .from('news')
-      .select('*')
-      .order('published_at', { ascending: false })
-      .then(({ data }) => { setNews(data ?? []); setLoading(false); });
+    const load = async () => {
+      try {
+        const data = await api.get('/news');
+        setNews(Array.isArray(data) ? data : []);
+      } catch {
+        setNews([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void load();
   }, []);
 
   const fmt = (d: string) =>

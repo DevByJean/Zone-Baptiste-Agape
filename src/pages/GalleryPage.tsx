@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { X, ZoomIn } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { api } from '../lib/api';
 import type { GalleryItem, Department } from '../types/database';
 
 const DEPARTMENTS: Department[] = ['Tous', 'Hommes', 'Femmes', 'Jeunesse', 'Enfants'];
@@ -12,10 +12,20 @@ export default function GalleryPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
-    const query = supabase.from('gallery').select('*').order('created_at', { ascending: false });
-    (filter === 'Tous' ? query : query.eq('department', filter))
-      .then(({ data }) => { setItems(data ?? []); setLoading(false); });
+    const load = async () => {
+      setLoading(true);
+      try {
+        const endpoint = filter === 'Tous' ? '/gallery' : `/gallery?department=${encodeURIComponent(filter)}`;
+        const data = await api.get(endpoint);
+        setItems(Array.isArray(data) ? data : []);
+      } catch {
+        setItems([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void load();
   }, [filter]);
 
   return (

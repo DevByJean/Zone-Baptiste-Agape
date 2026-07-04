@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail, Facebook, Youtube, Twitter, Instagram } from 'lucide-react';
 import { useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { api } from '../lib/api';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
@@ -11,12 +11,12 @@ export default function Footer() {
     e.preventDefault();
     if (!email) return;
     setStatus('loading');
-    const { error } = await supabase.from('subscribers').insert({ email });
-    if (error && error.code !== '23505') {
-      setStatus('error');
-    } else {
+    try {
+      await api.post('/subscribers', { data: { email } });
       setStatus('success');
       setEmail('');
+    } catch {
+      setStatus('error');
     }
   };
 

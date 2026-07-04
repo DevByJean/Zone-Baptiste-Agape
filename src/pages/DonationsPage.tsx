@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Heart, CheckCircle, Shield, Smartphone } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { api } from '../lib/api';
 import type { DonationInsert } from '../types/database';
 
 type Method = 'PayPal' | 'Mixx' | 'Moov';
@@ -27,8 +27,12 @@ export default function DonationsPage() {
       donor_name: donor.name || null,
       donor_email: donor.email || null,
     };
-    const { error } = await supabase.from('donations').insert(payload);
-    setStatus(error ? 'error' : 'success');
+    try {
+      await api.post('/donations', { data: payload });
+      setStatus('success');
+    } catch {
+      setStatus('error');
+    }
   };
 
   const methods: { id: Method; label: string; icon: React.ReactNode; color: string }[] = [

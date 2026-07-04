@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { BookOpen, Award, Users, Quote } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { api } from '../lib/api';
 import type { Member } from '../types/database';
 
 function PageHero() {
@@ -121,11 +121,16 @@ export default function AboutPage() {
   const [members, setMembers] = useState<Member[]>([]);
 
   useEffect(() => {
-    supabase
-      .from('members')
-      .select('*')
-      .order('display_order')
-      .then(({ data }) => setMembers(data ?? []));
+    const load = async () => {
+      try {
+        const data = await api.get('/members');
+        setMembers(Array.isArray(data) ? data : []);
+      } catch {
+        setMembers([]);
+      }
+    };
+
+    void load();
   }, []);
 
   return (
